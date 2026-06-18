@@ -2,16 +2,28 @@ const express = require('express');
 
 const app = express();
 
-app.get('/', (req, res) => {
+app.get('/users', (req, res) => {
+  res.send({firstName: 'John', lastName: 'Doe'});
+});
+
+app.post('/users', (req, res) => {
+  res.send('Data Successfully saved to the database');
+});
+
+app.delete('/users', (req, res) => {
+  res.send('Data Successfully deleted from the database');
+});
+
+app.put('/users', (req, res) => {
+  res.send('Data Successfully updated in the database');
+});
+
+app.patch('/users', (req, res) => {
+  res.send('Data Successfully updated in the database via patch');
+});
+
+app.use('/', (req, res) => {
   res.send('Hello, World!');
-});
-
-app.get('/test', (req, res) => {
-    res.send('This is the test page.');
-});
-
-app.get('/hello', (req, res) => {
-    res.send('This is the hello page.');
 });
 
 app.listen(3000, () => {
