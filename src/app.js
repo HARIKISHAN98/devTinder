@@ -2,27 +2,34 @@ const express = require("express");
 
 const app = express();
 
-app.use("/users", [
-  (req, res, next) => {
-    console.log("1st Route handler");
-    next();
-  },
-  [
-    (req, res, next) => {
-      console.log("2nd Route handler");
-      next();
-    },
-    (req, res, next) => {
-      console.log("3rd Route handler");
-      next();
-    },
-  ],
-  (req, res, next) => {
-    console.log("4th Route handler");
-    next();
-    res.send("Hello from the users route");
-  },
-]);
+const {adminAuth, userAuth} = require("./middlewares/adminAuth");
+
+app.use('/admin', adminAuth);
+
+app.get("/admin/getData", (req, res) => {
+    console.log("Admin is Authorized to get data");
+    res.send("Data send to admin");
+});
+
+app.get("/admin/deleteData", (req, res) => {
+    console.log("Admin is Authorized to delete data");
+    res.send("Data deleted from admin");
+});
+ 
+app.get("/user/login", (req, res) => {
+    console.log("User is logged in successfully");
+    res.send("User logged in successfully");
+});
+
+app.get("/user/getData", userAuth, (req, res) => {
+    console.log("User is Authorized to get data");
+    res.send("Data send to user");
+});
+
+app.get("/user/deleteData", userAuth, (req, res) => {
+    console.log("User is Authorized to delete data");
+    res.send("Data deleted from user");
+}); 
 
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
