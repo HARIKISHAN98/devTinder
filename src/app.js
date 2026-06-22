@@ -16,6 +16,47 @@ app.post("/signup", async (req, res) => {
   }
 });
 
+// API Get User by email
+app.get("/users", async (req,res) => {
+  const emailID = req.body.email;
+  console.log(emailID);
+   try{
+    const users = await User.find({email : emailID});
+    if(users.length === 0){
+      res.status(404).send("User not found");
+    } else {
+    res.send(users);
+    }
+   } catch(err){
+      res.status(400).send("Something went Wrong!");
+   }
+})
+
+//API Get User - findbyID
+// app.get("/user/:id", async (req, res) => {
+//   const id = req.params.id;
+//   try{
+//     const user = await User.findById(id);
+//     if(!user){
+//       res.status(404).send("user not found!");
+//     } else {
+//       res.send(user);
+//     }
+//   } catch(err){
+//     res.status(400).send("Something went wrong!");
+//   }
+// })
+
+// API - feed API - Get /feed - get all the users from the database
+app.get('/feed',async (req,res) => {
+    try{
+      const users = await User.find({});
+      res.send(users);
+    } catch(err){
+      res.status(404).send("User not found!");
+    }
+})
+
 connectDB()
   .then(() => {
     console.log("Database Connection Established...");
