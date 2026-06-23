@@ -76,9 +76,19 @@ app.delete("/deleteUser", async (req, res) => {
 });
 
 //API - update the user (via _id) - findByIdAndUpdate()
-app.patch("/updateUser", async (req, res) => {
-  const id = req.body.id;
+app.patch("/updateUser/:id", async (req, res) => {
   try {
+    const id = req.params?.id;
+    const ALLOWED_UPDATES = ["photoURL", "about", "gender", "age", "skills"];
+    const isUpdateAllowed = Object.keys(req.body).every(k => ALLOWED_UPDATES.includes(k));
+    if (!isUpdateAllowed) {
+      throw new Error("update not Allowed");
+    }
+
+    if (req.body?.skills.length > 10) {
+      throw new Error("Skills should not be more than 10");
+    }
+
     const user = await User.findByIdAndUpdate({ _id: id }, req.body, {
       returnDocument: "after",
       runValidators: true,
