@@ -17,7 +17,7 @@ app.post("/signup", async (req, res) => {
   }
 });
 
-// API Get User by email
+// API Get User by email - find()
 app.get("/users", async (req, res) => {
   const emailID = req.body.email;
   console.log(emailID);
@@ -33,7 +33,7 @@ app.get("/users", async (req, res) => {
   }
 });
 
-//API Get User - findbyID
+//API Get User - findById()
 // app.get("/user/:id", async (req, res) => {
 //   const id = req.params.id;
 //   try{
@@ -50,7 +50,7 @@ app.get("/users", async (req, res) => {
 
 // API - feed API - Get /feed - get all the users from the database
 
-//API - feed - get all the users
+//API - feed - get all the users - find()
 app.get("/feed", async (req, res) => {
   try {
     const users = await User.find({});
@@ -78,17 +78,20 @@ app.delete("/deleteUser", async (req, res) => {
 //API - update the user (via _id) - findByIdAndUpdate()
 app.patch("/updateUser", async (req, res) => {
   const id = req.body.id;
-  try{
-    const user = await User.findByIdAndUpdate({_id : id}, req.body, { returnDocument:"before"});
-    if(!user){
+  try {
+    const user = await User.findByIdAndUpdate({ _id: id }, req.body, {
+      returnDocument: "after",
+      runValidators: true,
+    });
+    if (!user) {
       res.status(404).send("User not found.");
     } else {
-    res.send(user);
+      res.send(user);
     }
-  } catch(err){
-    res.status(400).send("Something went wrong!!");
+  } catch (err) {
+    res.status(400).send("Update Failed : " + err.message);
   }
-})
+});
 
 //API - update the user (via email) - findOneAndUpdate()
 // app.patch("/updateUser", async (req, res) => {
