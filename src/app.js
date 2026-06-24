@@ -1,15 +1,28 @@
 const express = require("express");
 const connectDB = require("./config/database");
-const User = require("./utils/User");
+const User = require("./models/User");
 const { trusted } = require("mongoose");
 const app = express();
+const { validateSignUpData } = require("./utils/validation");
+const bcrypt = require("bcrypt");
 
 app.use(express.json());
 
 app.post("/signup", async (req, res) => {
-  // creating a new instance of User model
-  const user = new User(req.body);
   try {
+    const { firstName, lastName, email, password } = req.body;
+    //Validate the request body
+    validateSignUpData(req);
+    //convert password into the hash
+    const hashpassword = await bcrypt.hash(password, 10);
+    console.log(hashpassword);
+    // creating a new instance of User model
+    const user = new User({
+      firstName,
+      lastName,
+      email,
+      password: hashpassword,
+    });
     await user.save();
     res.send("Data added sucessfully!!");
   } catch (err) {
@@ -80,7 +93,9 @@ app.patch("/updateUser/:id", async (req, res) => {
   try {
     const id = req.params?.id;
     const ALLOWED_UPDATES = ["photoURL", "about", "gender", "age", "skills"];
-    const isUpdateAllowed = Object.keys(req.body).every(k => ALLOWED_UPDATES.includes(k));
+    const isUpdateAllowed = Object.keys(req.body).every((k) =>
+      ALLOWED_UPDATES.includes(k),
+    );
     if (!isUpdateAllowed) {
       throw new Error("update not Allowed");
     }
