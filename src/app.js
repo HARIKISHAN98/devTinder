@@ -6,8 +6,11 @@ const app = express();
 const { validateSignUpData } = require("./utils/validation");
 const bcrypt = require("bcrypt");
 const validate = require("validator");
+const cookieParse = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 
 app.use(express.json());
+app.use(cookieParse());
 
 //SignUp API
 app.post("/signup", async (req, res) => {
@@ -49,8 +52,34 @@ app.post("/login", async (req, res) => {
     if (!isPasswordValid) {
       throw new Error("Invalid Credentials");
     } else {
+      //create a token
+      const token = await jwt.sign({ _id: user._id }, "DEV@TINDER$790");
+      //add the token in the cookie and send back as response to user
+      res.cookie("token", token);
       res.status(200).send("Login Successful");
     }
+  } catch (err) {
+    res.status(400).send("ERROR : " + err.message);
+  }
+});
+
+//get profile
+app.get("/profile", async (req, res) => {
+  try {
+    const cookies = req.cookies;
+    const { token } = cookies;
+    if (!token) {
+      throw new Error("Invalid Token");
+    }
+    //validate token
+    const decodedMessage = await jwt.verify(token, "DEV@TINDER$790");
+    const { _id } = decodedMessage;
+
+    const user = await User.findById(_id);
+    if (!user) {
+      throw new Error("User does not Exist");
+    }
+    res.send(user);
   } catch (err) {
     res.status(400).send("ERROR : " + err.message);
   }
