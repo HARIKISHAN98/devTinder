@@ -5,9 +5,11 @@ const { trusted } = require("mongoose");
 const app = express();
 const { validateSignUpData } = require("./utils/validation");
 const bcrypt = require("bcrypt");
+const validate = require("validator");
 
 app.use(express.json());
 
+//SignUp API
 app.post("/signup", async (req, res) => {
   try {
     const { firstName, lastName, email, password } = req.body;
@@ -15,7 +17,6 @@ app.post("/signup", async (req, res) => {
     validateSignUpData(req);
     //convert password into the hash
     const hashpassword = await bcrypt.hash(password, 10);
-    console.log(hashpassword);
     // creating a new instance of User model
     const user = new User({
       firstName,
@@ -27,6 +28,31 @@ app.post("/signup", async (req, res) => {
     res.send("Data added sucessfully!!");
   } catch (err) {
     res.status(400).send("Error saving the user : " + err.message);
+  }
+});
+
+//Login API
+app.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!validate.isEmail(email)) {
+      throw new Error("Enter a valid email");
+    }
+    const user = await User.findOne({ email: email });
+
+    if (!user) {
+      throw new Error("Invalid Credentials");
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      throw new Error("Invalid Credentials");
+    } else {
+      res.status(200).send("Login Successful");
+    }
+  } catch (err) {
+    res.status(400).send("ERROR : " + err.message);
   }
 });
 
