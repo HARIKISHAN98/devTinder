@@ -8,6 +8,7 @@ const bcrypt = require("bcrypt");
 const validate = require("validator");
 const cookieParse = require("cookie-parser");
 const jwt = require("jsonwebtoken");
+const { userAuth } = require("./middlewares/adminAuth");
 
 app.use(express.json());
 app.use(cookieParse());
@@ -53,9 +54,9 @@ app.post("/login", async (req, res) => {
       throw new Error("Invalid Credentials");
     } else {
       //create a token
-      const token = await jwt.sign({ _id: user._id }, "DEV@TINDER$790");
+      const token = await jwt.sign({ _id: user._id }, "DEV@TINDER$790",{ expiresIn:"7d"});
       //add the token in the cookie and send back as response to user
-      res.cookie("token", token);
+      res.cookie("token", token, {expires: new Date(Date.now() +  7*24*60*60*1000 )});
       res.status(200).send("Login Successful");
     }
   } catch (err) {
@@ -64,130 +65,24 @@ app.post("/login", async (req, res) => {
 });
 
 //get profile
-app.get("/profile", async (req, res) => {
+app.get("/profile", userAuth, async (req, res) => {
   try {
-    const cookies = req.cookies;
-    const { token } = cookies;
-    if (!token) {
-      throw new Error("Invalid Token");
-    }
-    //validate token
-    const decodedMessage = await jwt.verify(token, "DEV@TINDER$790");
-    const { _id } = decodedMessage;
-
-    const user = await User.findById(_id);
-    if (!user) {
-      throw new Error("User does not Exist");
-    }
+    user = req.user;
     res.send(user);
   } catch (err) {
     res.status(400).send("ERROR : " + err.message);
   }
 });
 
-// API Get User by email - find()
-app.get("/users", async (req, res) => {
-  const emailID = req.body.email;
-  console.log(emailID);
+//post sendConnectionRequest
+app.post("/sendConnectionRequest", userAuth, async (req, res) => {
   try {
-    const users = await User.find({ email: emailID });
-    if (users.length === 0) {
-      res.status(404).send("User not found");
-    } else {
-      res.send(users);
-    }
+    const user = req.user;
+    res.send(user.firstName + " sended the connection Request");
   } catch (err) {
-    res.status(400).send("Something went Wrong!");
+    res.status(400).send("ERROR :- " + err.message);
   }
 });
-
-//API Get User - findById()
-// app.get("/user/:id", async (req, res) => {
-//   const id = req.params.id;
-//   try{
-//     const user = await User.findById(id);
-//     if(!user){
-//       res.status(404).send("user not found!");
-//     } else {
-//       res.send(user);
-//     }
-//   } catch(err){
-//     res.status(400).send("Something went wrong!");
-//   }
-// })
-
-// API - feed API - Get /feed - get all the users from the database
-
-//API - feed - get all the users - find()
-app.get("/feed", async (req, res) => {
-  try {
-    const users = await User.find({});
-    res.send(users);
-  } catch (err) {
-    res.status(404).send("User not found!");
-  }
-});
-
-//APi - delete the user - findByIdAndDelete()
-app.delete("/deleteUser", async (req, res) => {
-  const id = req.body.id;
-  try {
-    const user = await User.findByIdAndDelete(id);
-    if (!user) {
-      res.status(404).send("User not found");
-    } else {
-      res.send("User deleted Sucessfully!");
-    }
-  } catch (err) {
-    res.status(400).send("Something went wrong!");
-  }
-});
-
-//API - update the user (via _id) - findByIdAndUpdate()
-app.patch("/updateUser/:id", async (req, res) => {
-  try {
-    const id = req.params?.id;
-    const ALLOWED_UPDATES = ["photoURL", "about", "gender", "age", "skills"];
-    const isUpdateAllowed = Object.keys(req.body).every((k) =>
-      ALLOWED_UPDATES.includes(k),
-    );
-    if (!isUpdateAllowed) {
-      throw new Error("update not Allowed");
-    }
-
-    if (req.body?.skills.length > 10) {
-      throw new Error("Skills should not be more than 10");
-    }
-
-    const user = await User.findByIdAndUpdate({ _id: id }, req.body, {
-      returnDocument: "after",
-      runValidators: true,
-    });
-    if (!user) {
-      res.status(404).send("User not found.");
-    } else {
-      res.send(user);
-    }
-  } catch (err) {
-    res.status(400).send("Update Failed : " + err.message);
-  }
-});
-
-//API - update the user (via email) - findOneAndUpdate()
-// app.patch("/updateUser", async (req, res) => {
-//   const email = req.body.email;
-//   try{
-//     const user = await User.findOneAndUpdate({email : email},req.body,{returnDocument:'after'});
-//     console.log(user);
-//     if(!user){
-//       res.status(404).send("User not found.");
-//     } else {
-//       res.send("User updated Sucessfully!");
-//     }
-//   } catch(err){
-//     res.status(400).send("Something went wrong!!");
-//   }
-// })
 
 connectDB()
   .then(() => {
