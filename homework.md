@@ -23,3 +23,6 @@ season 2, Ep:12
 - what is the advantage and disadvantage of creating ?
 - Read the article about compound indexes :- 
 - ALWAYS THINK ABOUT CORNER CASES
+
+season 2, Ep:13
+- write code with proper validation /request/review/:status/:requestId

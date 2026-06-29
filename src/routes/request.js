@@ -14,7 +14,6 @@ requestRouter.post(
       const toUserId = req.params.toUserId;
       const fromUserId = req.user._id;
       const status = req.params.status;
-      console.log(toUserId + " " + fromUserId + " " + status);
 
       //check Allowed Status
       const allowedStatus = ["interested", "ignored"];
@@ -50,7 +49,6 @@ requestRouter.post(
           { fromUserId: toUserId, toUserId: fromUserId },
         ],
       });
-      console.log("existingConnectionRequest : " + existingConnectionRequest);
       if (existingConnectionRequest) {
         return res.status(400).send({
           message: "Connection Request Already Exist!",
@@ -64,14 +62,66 @@ requestRouter.post(
       });
       const data = await ConnectionRequest.save();
       let message;
-      if(status === "interested"){
+      if (status === "interested") {
         message = `${req.user.firstName} is interested in ${toUser.firstName}`;
       } else {
         message = `${req.user.firstName} has ignored ${toUser.firstName}`;
       }
-      res.send({message, data});
+      res.send({ message, data });
     } catch (err) {
       res.status(400).send("ERROR :- " + err.message);
+    }
+  },
+);
+
+//post reviewConnectionRequest
+requestRouter.post(
+  "/request/review/:status/:requestId",
+  userAuth,
+  async (req, res) => {
+    try {
+      const loggedInUser = req.user;
+      const { status, requestId } = req.params;
+
+      //status is correct or not
+      const allowedStatus = ["accepted", "rejected"];
+      if (!allowedStatus.includes(status)) {
+        return res
+          .status(400)
+          .json({ message: status + " : Status is not allowed " });
+      }
+
+      //reqestId is correct or not
+      const isRequestIdvalid = await mongoose.Types.ObjectId.isValid(requestId);
+      if (!isRequestIdvalid) {
+        return res.status(400).json({ message: "RequestId is not Valid" });
+      }
+
+      //reqestId present in DB
+      const ConnectionRequest = await connectionRequest.findOne({
+        _id: requestId,
+        toUserId: loggedInUser._id,
+        status: "interested",
+      });
+
+      if (!ConnectionRequest) {
+        return res
+          .status(404)
+          .json({ message: "Connection Request not found" });
+      }
+
+      ConnectionRequest.status = status;
+
+      const SenderId = ConnectionRequest.fromUserId;
+      const RequestSender = await User.findById(SenderId);
+
+      const data = await ConnectionRequest.save();
+      res.send({
+        message: `${loggedInUser.firstName} is ${status} the ${RequestSender.firstName} request`,
+        data,
+      });
+    } catch (err) {
+      res.status(400).send("ERROR : " + err.message);
     }
   },
 );
