@@ -98,11 +98,13 @@ requestRouter.post(
       }
 
       //reqestId present in DB
-      const ConnectionRequest = await connectionRequest.findOne({
-        _id: requestId,
-        toUserId: loggedInUser._id,
-        status: "interested",
-      });
+      const ConnectionRequest = await connectionRequest
+        .findOne({
+          _id: requestId,
+          toUserId: loggedInUser._id,
+          status: "interested",
+        })
+        .populate("fromUserId", "firstName");
 
       if (!ConnectionRequest) {
         return res
@@ -112,12 +114,9 @@ requestRouter.post(
 
       ConnectionRequest.status = status;
 
-      const SenderId = ConnectionRequest.fromUserId;
-      const RequestSender = await User.findById(SenderId);
-
       const data = await ConnectionRequest.save();
       res.send({
-        message: `${loggedInUser.firstName} is ${status} the ${RequestSender.firstName} request`,
+        message: `${loggedInUser.firstName} is ${status} the ${ConnectionRequest.fromUserId.firstName} request`,
         data,
       });
     } catch (err) {

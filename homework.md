@@ -26,3 +26,7 @@ season 2, Ep:12
 
 season 2, Ep:13
 - write code with proper validation /request/review/:status/:requestId
+- Thought process - POST vs GET
+- read about ref and populate 
+- create GET user/requests/received with all the check 
+- create GET /user/connections

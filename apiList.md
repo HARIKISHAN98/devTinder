@@ -18,7 +18,7 @@ POST request/review/:status/id:requestId
 POST request/review/reject/id:requestId -->
 
 ## userRouter
+GET user/requests/received
 GET user/connections
-GET user/request
 GET user/feed ( gets you profile of other user on plateform)
 
