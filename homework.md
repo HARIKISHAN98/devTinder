@@ -30,3 +30,8 @@ season 2, Ep:13
 - read about ref and populate 
 - create GET user/requests/received with all the check 
 - create GET /user/connections
+
+season 2, Ep:14
+- logic for GET /feed API
+- Explore the $nin, $and, $ne and other query operator
+- implement pagination, via skip() limit() method of mongodb
