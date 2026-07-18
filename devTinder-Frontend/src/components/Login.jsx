@@ -1,18 +1,27 @@
 import { useState } from 'react';
 import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { addUser } from '../utils/userSlice';
+import { useNavigate } from 'react-router-dom';
+import { BASE_URL } from '../utils/constant';
 
 const Login = () => {
 
   const [email, setEmail] = useState("hari@gmail.com");
   const [password, setPassword] = useState("Kusha@123");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     try {
-      const data = axios.post('http://localhost:3000/login', { email, password }, { withCredentials: true });
+      const res = await axios.post(`${BASE_URL}/login`, { email, password }, { withCredentials: true });
+      console.log('Login successful:', res.data);
+      dispatch(addUser(res.data));
+      navigate('/');
     } catch (error) {
       console.error('Login error:', error);
     }
-  }
+  } 
 
   return (
     <div className="flex justify-center my-10">

@@ -1,5 +1,7 @@
 # DevTinder
 
+1.
+
 - Create a Vite + React application
 - Remove Unecessary code and create a Hello World App
 - Install Tailwind CSS
@@ -11,9 +13,18 @@
 - Create an Outlet in your Body Component
 - Create a footer
 
-Ep-2 
+2. 
 
 - Create a Login Page 
 - Install Axios 
 - CORS - Install Cors in backend - Add middleware to with configuration: origin, credentials: true
 - whenever you are making API Call so pass axios => { withCredentials: true }
+
+3. 
+
+- Install react-redux + @reduxjs/toolkit 
+- configureStore => Provider => createSlice => add reducer in store  
+- Add redux devtools in chrome
+- login and see if your data is coming properly in the store
+- Navbar should update as soon as user logs in 
+- Refactor our code to add constants file + create a component folder
