@@ -9,6 +9,7 @@ const Login = () => {
 
   const [email, setEmail] = useState("hari@gmail.com");
   const [password, setPassword] = useState("Kusha@123");
+  const [error, setError] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -19,7 +20,7 @@ const Login = () => {
       dispatch(addUser(res.data));
       navigate('/');
     } catch (error) {
-      console.error('Login error:', error);
+      setError(error.response?.data || 'Login failed');
     }
   } 
 
@@ -38,6 +39,7 @@ const Login = () => {
               <input type="password" className="input" placeholder="Type your password" value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>    
           </div>
+          {error && <p className="text-error">{error}</p>}
           <div className="card-actions justify-center">
             <button className="btn btn-primary" onClick={handleLogin}>Login</button>
           </div>
