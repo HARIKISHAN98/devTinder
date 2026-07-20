@@ -16,7 +16,7 @@ const Login = () => {
   const handleLogin = async () => {
     try {
       const res = await axios.post(`${BASE_URL}/login`, { email, password }, { withCredentials: true });
-      console.log('Login successful:', res.data);
+      // console.log('Login successful:', res.data);
       dispatch(addUser(res.data));
       navigate('/');
     } catch (error) {
