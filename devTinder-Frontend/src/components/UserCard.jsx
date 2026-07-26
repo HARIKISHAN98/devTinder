@@ -1,5 +1,5 @@
 const UserCard = ({user}) => {
-const {firstName, lastName, photoURL, about, skills} = user || {};
+const {firstName, lastName, photoURL, about, age, gender} = user || {};
 
   return (
     <div>
@@ -12,6 +12,7 @@ const {firstName, lastName, photoURL, about, skills} = user || {};
         </figure>
         <div className="card-body">
           <h2 className="card-title">{firstName} {lastName}</h2>
+          {(age && gender) && <p> {age}, {gender} </p>}
           <p>
             {about}
           </p>

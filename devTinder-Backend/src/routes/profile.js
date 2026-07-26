@@ -29,7 +29,7 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
     }
     //validate request Body
     validateProfileEditData(req);
-    Object.keys(req.body).every((key) => (req.user[key] = req.body[key]));
+    Object.keys(req.body).forEach((key) => (req.user[key] = req.body[key]));
     // await req.user.save();
     res.status(200).json({
       success: 200,
