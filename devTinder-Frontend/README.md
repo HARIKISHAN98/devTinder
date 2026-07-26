@@ -33,3 +33,6 @@
 - Logout feature
 - Get the feed and add the feed in the store
 - build the userCard on the feed
+- Edit Profile Feature
+- show Toast Message on save of profile
+- see all my connections
